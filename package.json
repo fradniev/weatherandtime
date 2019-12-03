@@ -1,0 +1,23 @@
+{
+  "name": "weatherandtime",
+  "version": "1.0.0",
+  "description": "Displays weather and time of an array of cities",
+  "main": "weatherandtime.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fradniev/weatherandtime.git"
+  },
+  "author": "Fradniev Gonzalez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fradniev/weatherandtime/issues"
+  },
+  "homepage": "https://github.com/fradniev/weatherandtime#readme",
+  "dependencies": {
+    "utf8": "^3.0.0",
+    "xmlhttprequest": "^1.8.0"
+  }
+}
