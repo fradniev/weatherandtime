@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/fradniev/weatherandtime#readme",
   "dependencies": {
-    "utf8": "^3.0.0",
     "xmlhttprequest": "^1.8.0"
   }
 }

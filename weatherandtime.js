@@ -1,5 +1,4 @@
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-const utf8 = require("utf8");
 const apiKeyWeather = "0a66000ee16210d9cffcde19fa27a62a";
 const apiKeyDate = "67baa1d6fec3468caed99152addfeb05";
 const cityNames = [
