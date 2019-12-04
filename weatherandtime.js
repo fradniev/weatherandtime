@@ -10,56 +10,55 @@ const cityNames = [
 	"Pluto",
 ];
 
-function requestWeather(cityName) {
-	let request = new XMLHttpRequest();
-	const apiLink = `http://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=metric&APPID=${apiKeyWeather}`;
-	request.open("GET", apiLink);
-	request.onload = () => {
-		try {
-			manageRequestWeather(request, cityName);
-		} catch(error) {
-			console.log(error);
-		}
-	}
-	request.send();
+function sendRequest(cityName) {
+	const apiLinks = [
+		`http://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=metric&APPID=${apiKeyWeather}`,
+		`https://api.opencagedata.com/geocode/v1/json?q=${cityName}&key=${apiKeyDate}`,
+	];
+	manageRequest(apiLinks, cityName);
+	
 }
 
-function manageRequestWeather(request, cityName) {
-	let weatherData = JSON.parse(request.responseText);
-	if(request.status >= 200 && request.status < 400) {
-		let temperature = weatherData.main.temp;
-		console.log(`The temperature of ${decodeURIComponent(cityName)} is ${temperature}`)
-	} else {
-		console.log(`${decodeURIComponent(cityName)} doesn't exist! Kindly check`)
-	}
+function manageRequest(apiLinks, cityName){
+	let results = []
+	const promises = apiLinks.map( (apiLink, index) => {
+		return new Promise((resolve,reject) => {
+			let request = new XMLHttpRequest();
+			request.open("GET", apiLink);
+			request.onload = () => {
+				try {
+					let requestJson = JSON.parse(request.responseText);
+					if (index<1) {
+						resolve(collectDataWeather(requestJson, cityName));
+					} else {
+						resolve(collectDataDate(requestJson, cityName));
+					}
+				} catch(error) {
+					console.log(`${decodeURIComponent(cityName)} doesn't exist! Please check the city name.`)
+				}
+			}
+			request.send();
+		});
+	});
+	cityName = decodeURIComponent(cityName);
+	Promise.all(promises).then(weatherAndTemperature => {
+		console.log(`The temperature of ${cityName} is ${weatherAndTemperature[0]} C and the date is ${weatherAndTemperature[1]}`);
+	});
 }
 
-function requestDate(cityName) {
-	let request = new XMLHttpRequest();
-	const apiLink = `https://api.opencagedata.com/geocode/v1/json?q=${cityName}&key=${apiKeyDate}`;
-	request.open("GET", apiLink);
-	request.onload = () => {
-		try {
-			manageRequestDate(request, cityName);
-		} catch(error) {
-			console.log(`${decodeURIComponent(cityName)} doesn't exist! Kindly check`)
-		}
-	}
-	request.send();
+function collectDataWeather(data, cityName) {
+	let temperature = data.main.temp;
+	return temperature;
 }
 
-function manageRequestDate(request, cityName) {
-	let dateData = JSON.parse(request.responseText);
-	let timezone = dateData.results[0].annotations.timezone.offset_sec
-	let date = new Date( new Date().getTime() + timezone*1000).toUTCString();
-	console.log(`The date of ${decodeURIComponent(cityName)} is ${date}`)
+function collectDataDate(data, cityName) {
+	let timezone = data.results[0].annotations.timezone.offset_sec;
+	let dateString = new Date( new Date().getTime() + timezone*1000).toUTCString();
+	return dateString;
 }
 
 function start() {
-	for (var i = 0; i < cityNames.length; i++) {
-		requestWeather(encodeURIComponent(cityNames[i]))
-		requestDate(encodeURIComponent(cityNames[i]))
-	}
+	cityNames.map( cityName => {sendRequest(encodeURIComponent(cityName))});
 }
 
-start()
+start();
